@@ -370,6 +370,17 @@ for _lang, _extra in _EXTRA6.items():
     T[_lang].update(_extra)
 
 
+# ---------- Подпись разработчика ----------
+
+_EXTRA7 = {
+    "az": {"developer_line": "👨‍💻 Developer: {name}"},
+    "ru": {"developer_line": "👨‍💻 Разработчик: {name}"},
+    "en": {"developer_line": "👨‍💻 Developer: {name}"},
+}
+for _lang, _extra in _EXTRA7.items():
+    T[_lang].update(_extra)
+
+
 # ---------- Служебные таблицы для статистики и фильтров ----------
 
 SECTION_BUTTONS = ("btn_clubs", "btn_events", "btn_news", "btn_board", "btn_about", "btn_faq", "btn_feedback", "btn_lang")

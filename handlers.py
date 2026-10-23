@@ -1,5 +1,6 @@
 import html
 import logging
+import re
 
 from aiogram import Bot, F, Router
 from aiogram.exceptions import TelegramBadRequest
@@ -11,7 +12,7 @@ import content
 import data
 import db
 import keyboards as kb
-from config import ADMIN_IDS
+from config import ADMIN_IDS, DEVELOPER_CONTACT, DEVELOPER_NAME
 from store import USER_LANG, get_lang
 from texts import LANGS, T, t
 
@@ -74,7 +75,24 @@ def render_about(lang: str) -> str:
         tail.append(t(lang, "room_line", room=html.escape(content.get_room())))
     if tail:
         parts.append("\n".join(tail))
+    credit = developer_line(lang)
+    if credit:
+        parts.append(credit)
     return "\n\n".join(parts)
+
+
+def developer_line(lang: str) -> str:
+    """Подпись разработчика; пустая строка, если имя не задано. @username превращается в ссылку на Telegram."""
+    if not DEVELOPER_NAME:
+        return ""
+    line = t(lang, "developer_line", name=html.escape(DEVELOPER_NAME))
+    contact = DEVELOPER_CONTACT
+    if contact:
+        if re.fullmatch(r"@[A-Za-z0-9_]{4,32}", contact):
+            line += f' · <a href="https://t.me/{contact[1:]}">{html.escape(contact)}</a>'
+        else:
+            line += f" · {html.escape(contact)}"
+    return line
 
 
 def render_board(lang: str) -> str:
@@ -118,7 +136,8 @@ async def cmd_help(message: Message, state: FSMContext):
     if not message.from_user:
         return
     lang = get_lang(message.from_user.id)
-    await message.answer(t(lang, "help"), reply_markup=kb.main_menu(lang))
+    credit = developer_line(lang)
+    await message.answer(t(lang, "help") + (f"\n\n{credit}" if credit else ""), reply_markup=kb.main_menu(lang))
 
 
 @router.message(Command("cancel"))
